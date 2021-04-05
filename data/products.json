@@ -1,1 +1,1 @@
-[{"title":"Paris Meetup"},{"title":"First book"},{"title":"San Francisco Meetup"},{"title":"Second Book"}]
+[{"id":"0.5818807451246046","title":"My First book","imageUrl":"https://oleschoolhouse.co.nz/wp-content/uploads/2013/01/HiRes.jpg","description":"This is my first book and i love it.","price":"20.25"},{"id":"0.0001148069583813971","title":"Munich Javascript Meetup","imageUrl":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSy3LkO3YboXK_R2EY_8tByIeuzh4Gb6BsEaKLeHNV_KdkRpXMp1LZgwjOsrRt_4K_JhIY&usqp=CAU","description":"Hello world!","price":"20"}]
