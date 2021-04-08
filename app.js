@@ -1,14 +1,8 @@
 const path = require('path');
 const express = require('express');
 const errorController = require('./controllers/error');
-const sequelize = require('./utils/database');
-
-const Product = require('./models/product');
+const mongoose = require('mongoose');
 const User = require('./models/user');
-const Cart = require('./models/cart');
-const CartItem = require('./models/cart-item');
-const Order = require('./models/order');
-const OrderItem = require('./models/order-item');
 
 const app = express();
 
@@ -24,52 +18,50 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Imported routes
-const adminRoutes = require('./routes/admin');
-const shopRoutes = require('./routes/shop');
-
 app.use((req, res, next) => {
-    User.findByPk(1)
+    User.findById('606e4ce8df403f208d9beb79')
         .then(user => {
             req.user = user;
             next();
         })
-        .catch(err => console.log(err));
-});
+        .catch(err => {
+            console.log(err);
+        });
+})
+
+// Imported routes
+const adminRoutes = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
+const authRoutes = require('./routes/auth');
 
 // Routes
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
+app.use(authRoutes);
 
 app.use(errorController.get404Page);
 
-Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
-User.hasMany(Product);
-User.hasOne(Cart);
-Cart.belongsTo(User);
-Cart.belongsToMany(Product, { through: CartItem });
-Product.belongsToMany(Cart, { through: CartItem });
-Order.belongsTo(User);
-User.hasMany(Order);
-Order.belongsToMany(Product, { through: OrderItem });
-
-// creates all the appropriate tables for your database using the models
-sequelize
-    // .sync({ force: true })
-    .sync()
+mongoose
+    .connect(process.env.DATABASE_URL, {
+        useNewUrlParser: true,
+        useCreateIndex: true,
+        useUnifiedTopology: true,
+        useFindAndModify: false
+    })
     .then(result => {
-        return User.findByPk(1);
-    })
-    .then(user => {
-        if (!user) {
-            return User.create({ name: 'Manuel', email: 'enartey992@gmail.com' });
-        }
-        return user;
-    })
-    .then(user => {
-        return user.createCart();
-    })
-    .then(cart => {
+        User.findOne().then(user => {
+            if (!user) {
+                const user = new User({
+                    name: 'Manuel',
+                    email: 'enartey992@gmail.com',
+                    cart: {
+                        items: []
+                    }
+                });
+                user.save();
+            }
+        });
+
         app.listen(port, () => {
             console.log(`server is running on http://localhost:${port}`);
         });
